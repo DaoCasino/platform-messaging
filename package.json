@@ -1,0 +1,58 @@
+{
+  "name": "@daocasino/platform-messaging",
+  "version": "1.0.0",
+  "description": "This library allows you to wrap your classes and use them over iframe",
+  "license": "MIT",
+  "author": "Gar|k <garik.djan@gmail.com>",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DaoCasino/platform-messaging.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DaoCasino/platform-messaging/issues"
+  },
+  "homepage": "https://github.com/DaoCasino/platform-messaging/#readme",
+  "scripts": {
+    "prepare": "yarn build",
+    "prebuild": "rm -rf lib && rm -rf lib.browser",
+    "build": "tsc && tsc -p tsconfig.browser.json",
+    "lint": "eslint 'src/**/*.{ts,tsx}'",
+    "test": "mocha -r ts-node/register src/tests/*.*.ts",
+    "prebuild:example": "rm -rf example/dist",
+    "build:example":"rollup -c",
+    "prestart:example": "yarn build:example",
+    "start:example": "serve example"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^12.0.7",
+    "@typescript-eslint/eslint-plugin": "^2.7.0",
+    "@typescript-eslint/parser": "^2.7.0",
+    "chai": "^4.1.2",
+    "eslint": "^6.6.0",
+    "eslint-config-prettier": "^6.5.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "husky": "^3.1.0",
+    "mocha": "^5.2.0",
+    "prettier": "^1.19.1",
+    "rollup": "^1.29.1",
+    "rollup-plugin-typescript2": "^0.25.3",
+    "serve": "^11.3.0",
+    "ts-node": "^8.2.0",
+    "typescript": "^3.5.1"
+  },
+  "files": [
+    "lib",
+    "lib.browser"
+  ],
+  "main": "lib/IframeTransportProvider.js",
+  "types": "lib/IframeTransportProvider.d.ts",
+  "husky": {
+    "hooks": {
+      "pre-push": "yarn test"
+    }
+  }
+}

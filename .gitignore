@@ -1,0 +1,17 @@
+node_modules/
+**/.DS_Store
+.node_modules/
+lib/
+lib.browser/
+**/.vs
+**/.vscode/*
+!**/.vscode/tasks.json
+!**/.vscode/settings.template.json
+!**/.vscode/launch.template.json
+!**/.vscode/extensions.json
+.idea
+yarn.lock
+yarn-error.log
+package-lock.json
+.eslintcache
+example/dist/
