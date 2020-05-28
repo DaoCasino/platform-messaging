@@ -55,13 +55,22 @@ export class IframeMessagingProvider implements MessagingProvider {
   }
 
   private static createChild(): Promise<IframeMessagingProvider> {
-    const { frameElement } = window
-    if (!frameElement) {
-      throw new Error('Звгружено не в ифрейме')
-    }
-    const { id } = frameElement
+    const getParentId = () => {
+      const { frameElement } = window
+      if (frameElement) return frameElement.id
+      console.error('not found window.frameElement')
+      const params = new URLSearchParams(window.location.search)
+      const id = params.get('iframe')
 
-    console.log('createChild', id)
+      if (!id) {
+        throw new Error('not found parent iframe id, set ?frame in url')
+      }
+
+      return id
+    }
+
+    const id = getParentId()
+    console.log('createChild', { id })
 
     return new Promise((resolve, _) => {
       const waitInitMessage = (event: MessageEvent) => {
