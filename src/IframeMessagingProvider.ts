@@ -5,17 +5,15 @@ import { ServiceWrapper } from './utils/ServiceWrapper'
 
 export type IframeMessagingType = 'parent' | 'child'
 
+const INIT_MESSAGE_DURATION = 600
+
 export class IframeMessagingProvider implements MessagingProvider {
   private otherWindow: Window
   private targetOrigin: string
   private id: string
   private services: Map<string, any>
 
-  private constructor(
-    id: string,
-    otherWindow: Window,
-    targetOrigin = window.location.href
-  ) {
+  private constructor(id: string, otherWindow: Window, targetOrigin = '*') {
     this.id = id
     this.otherWindow = otherWindow
     this.targetOrigin = targetOrigin
@@ -70,7 +68,7 @@ export class IframeMessagingProvider implements MessagingProvider {
     }
 
     const id = getParentId()
-    console.log('createChild', { id })
+    console.log('createChild ', id)
 
     return new Promise((resolve, _) => {
       const waitInitMessage = (event: MessageEvent) => {
@@ -78,6 +76,7 @@ export class IframeMessagingProvider implements MessagingProvider {
 
         if (event.data == id + '_init') {
           window.removeEventListener('message', waitInitMessage)
+          ;(event.source as Window).postMessage(id + '_complete', event.origin)
           resolve(
             new IframeMessagingProvider(
               id,
@@ -102,28 +101,47 @@ export class IframeMessagingProvider implements MessagingProvider {
 
     console.log('createParent', id)
 
-    const initMessage = (childWindow: Window) => {
-      childWindow.onload = () => {
-        childWindow.postMessage(id + '_init', window.location.href)
-      }
+    const initMessage = (
+      childWindow: Window
+    ): Promise<IframeMessagingProvider> => {
+      return new Promise((resolve, _) => {
+        const sendInitMessage = () => childWindow.postMessage(id + '_init', '*')
+        const timer = setInterval(sendInitMessage, INIT_MESSAGE_DURATION)
+
+        const waitCompliteMessage = (event: MessageEvent) => {
+          if (event.data == id + '_complete') {
+            clearInterval(timer)
+            window.removeEventListener('message', waitCompliteMessage)
+            resolve(
+              new IframeMessagingProvider(
+                id,
+                event.source as Window,
+                event.origin
+              )
+            )
+          }
+        }
+
+        window.addEventListener('message', waitCompliteMessage, false)
+        sendInitMessage()
+      })
     }
 
     const { contentWindow } = iframe
     if (contentWindow) {
       const { document } = contentWindow
       if (document.readyState == 'complete') {
-        initMessage(contentWindow)
-        return Promise.resolve(new IframeMessagingProvider(id, contentWindow))
+        return initMessage(contentWindow)
       }
     }
 
     return new Promise((resolve, reject) => {
       const err = () => reject(new Error('Iframe not loaded'))
-      iframe.onload = () => {
+      iframe.onload = async () => {
         const { contentWindow } = iframe
         if (contentWindow) {
-          initMessage(contentWindow)
-          resolve(new IframeMessagingProvider(id, contentWindow))
+          const provider = await initMessage(contentWindow)
+          resolve(provider)
         } else {
           err()
         }
@@ -142,11 +160,11 @@ export class IframeMessagingProvider implements MessagingProvider {
       )
     )
 
-    // TODO: надо event emmiter сделать
     const subscribe = (event: MessageEvent) => {
-      if (event.origin != this.otherWindow.origin) {
-        return
-      }
+      // TODO: remove cross-origin check
+      // if (event.origin != this.otherWindow.origin) {
+      //   return
+      // }
 
       const { message, data } = event.data
       if (message != name + '_request') {
@@ -171,9 +189,10 @@ export class IframeMessagingProvider implements MessagingProvider {
     })
 
     const subscribe = (event: MessageEvent) => {
-      if (event.origin != this.otherWindow.origin) {
-        return
-      }
+      // TODO: remove cross-origin check
+      // if (event.origin != this.otherWindow.origin) {
+      //   return
+      // }
 
       const { message, data } = event.data
       if (message != name + '_response') {
