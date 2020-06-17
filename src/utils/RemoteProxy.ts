@@ -6,8 +6,6 @@ import {
 } from '../interfaces/JsonRpc'
 import { getId, jsonrpc } from './'
 
-const DEFAULT_TIMEOUT = 15000 // TODO: proccess.env
-
 interface RequestCallback {
   resolve: (data: any) => void
   reject: (error: Error) => void
@@ -26,7 +24,7 @@ export class RemoteProxy {
 
   public getProxy<TRemoteService>(
     sendRequest: (request: JsonRpcRequest) => void,
-    requestTimeoutMs = DEFAULT_TIMEOUT
+    requestTimeoutMs: number
   ): TRemoteService {
     const requestCallbacks = this.requestCallbacks
     const requestTimeouts = this.requestTimeouts

@@ -6,6 +6,7 @@ import { ServiceWrapper } from './utils/ServiceWrapper'
 export type IframeMessagingType = 'parent' | 'child'
 
 const INIT_MESSAGE_DURATION = 600
+const PROXY_REQUEST_TIMEOUT = 15000
 
 export class IframeMessagingProvider implements MessagingProvider {
   private otherWindow: Window
@@ -179,14 +180,17 @@ export class IframeMessagingProvider implements MessagingProvider {
     this.services.set(name, subscribe)
   }
 
-  public getRemoteService<TRemoteService>(name: string) {
+  public getRemoteService<TRemoteService>(
+    name: string,
+    requestTimeoutMs = PROXY_REQUEST_TIMEOUT
+  ) {
     const remoteProxy = new RemoteProxy()
     const proxy = remoteProxy.getProxy((request: JsonRpcRequest) => {
       this.otherWindow.postMessage(
         { message: name + '_request', data: request },
         this.targetOrigin
       )
-    })
+    }, requestTimeoutMs)
 
     const subscribe = (event: MessageEvent) => {
       // TODO: remove cross-origin check
