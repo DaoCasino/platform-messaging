@@ -107,7 +107,7 @@ export class RemoteProxy {
         if (error instanceof JsonRpcError) {
           callback.reject(error)
         } else {
-          throw new Error(`[${id}] onMessage: error not valid type`)
+          callback.reject(new Error(`[${id}] onMessage: error not valid type`))
         }
       } else {
         callback.resolve(result)
