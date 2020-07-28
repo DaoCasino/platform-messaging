@@ -173,9 +173,7 @@ export class IframeMessagingProvider implements MessagingProvider {
       }
 
       const request: JsonRpcRequest =
-        typeof data === 'string' || data instanceof String
-          ? JSON.parse(data)
-          : (data as JsonRpcRequest)
+        typeof data === 'string' ? JSON.parse(data) : (data as JsonRpcRequest)
 
       console.log('exposeService event', name, event)
       wrapper.onRequest(request)
@@ -212,9 +210,7 @@ export class IframeMessagingProvider implements MessagingProvider {
       console.log('getRemoteService event', name, event)
 
       const response: JsonRpcResponse =
-        typeof data === 'string' || data instanceof String
-          ? JSON.parse(data)
-          : (data as JsonRpcResponse)
+        typeof data === 'string' ? JSON.parse(data) : (data as JsonRpcResponse)
 
       remoteProxy.onMessage(response)
     }
