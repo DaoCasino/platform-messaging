@@ -193,6 +193,7 @@ export class IframeMessagingProvider implements MessagingProvider {
     }, requestTimeoutMs)
 
     const subscribe = (event: MessageEvent) => {
+      console.log('message', event)
       // TODO: remove cross-origin check
       // if (event.origin != this.otherWindow.origin) {
       //   return
