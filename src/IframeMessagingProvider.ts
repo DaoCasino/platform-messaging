@@ -156,7 +156,7 @@ export class IframeMessagingProvider implements MessagingProvider {
 
     const wrapper = new ServiceWrapper(service, (response: JsonRpcResponse) =>
       this.otherWindow.postMessage(
-        { message: name + '_response', data: JSON.stringify(response) },
+        { message: name + '_response', data: response },
         this.targetOrigin
       )
     )
@@ -172,11 +172,8 @@ export class IframeMessagingProvider implements MessagingProvider {
         return
       }
 
-      const request: JsonRpcRequest =
-        typeof data === 'string' ? JSON.parse(data) : (data as JsonRpcRequest)
-
       console.log('exposeService event', name, event)
-      wrapper.onRequest(request)
+      wrapper.onRequest(data as JsonRpcRequest)
     }
 
     window.addEventListener('message', subscribe, false)
@@ -190,7 +187,7 @@ export class IframeMessagingProvider implements MessagingProvider {
     const remoteProxy = new RemoteProxy()
     const proxy = remoteProxy.getProxy((request: JsonRpcRequest) => {
       this.otherWindow.postMessage(
-        { message: name + '_request', data: JSON.stringify(request) },
+        { message: name + '_request', data: request },
         this.targetOrigin
       )
     }, requestTimeoutMs)
@@ -208,11 +205,7 @@ export class IframeMessagingProvider implements MessagingProvider {
       }
 
       console.log('getRemoteService event', name, event)
-
-      const response: JsonRpcResponse =
-        typeof data === 'string' ? JSON.parse(data) : (data as JsonRpcResponse)
-
-      remoteProxy.onMessage(response)
+      remoteProxy.onMessage(data as JsonRpcResponse)
     }
     window.addEventListener('message', subscribe, false)
     this.services.set(name, subscribe)
