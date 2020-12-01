@@ -36,6 +36,7 @@ export class JsonRpcError extends Error {
     data: string | undefined = undefined
   ) {
     super(message)
+    this.name = 'JsonRpcError'
     this.code = code
     if (data) {
       this.stack = data

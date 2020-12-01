@@ -2,7 +2,6 @@ import {
   JsonRpcRequest,
   JsonRpcResponse,
   JsonRpcId,
-  JsonRpcError,
 } from '../interfaces/JsonRpc'
 import { getId, jsonrpc } from './'
 
@@ -104,7 +103,7 @@ export class RemoteProxy {
       this.deleteRequestCallback(id)
 
       if (error) {
-        if (error instanceof JsonRpcError) {
+        if (error instanceof Error) {
           callback.reject(error)
         } else {
           callback.reject(new Error(`[${id}] onMessage: error not valid type`))
