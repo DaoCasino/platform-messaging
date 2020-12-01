@@ -1,6 +1,6 @@
 {
   "name": "@daocasino/platform-messaging",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "This library allows you to wrap your classes and use them over iframe",
   "license": "MIT",
   "author": "Gar|k <garik.djan@gmail.com>",

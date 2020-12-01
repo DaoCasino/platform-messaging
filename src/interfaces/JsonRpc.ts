@@ -48,10 +48,7 @@ export class JsonRpcError extends Error {
     err: Error,
     code: JsonRpcErrorCode = JsonRpcErrorCode.INTERNAL_ERROR
   ): JsonRpcError {
-    const e = err as JsonRpcError
-    e.code = code
-
-    return e
+    return new JsonRpcError(err.message, code)
   }
 }
 

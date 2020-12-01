@@ -54,7 +54,7 @@ export class ServiceWrapper<TService> {
       try {
         response.result = await func.call(this.service, ...params)
       } catch (error) {
-        console.error(error)
+        console.error('callback error', error)
         response.error = JsonRpcError.fromError(error)
       }
     }
