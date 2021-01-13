@@ -3,8 +3,6 @@ import { RemoteProxy } from './utils/RemoteProxy'
 import { JsonRpcRequest, JsonRpcResponse } from './interfaces/JsonRpc'
 import { ServiceWrapper } from './utils/ServiceWrapper'
 
-export type IframeMessagingType = 'parent' | 'child'
-
 const INIT_MESSAGE_DURATION = 600
 const PROXY_REQUEST_TIMEOUT = 15000
 
@@ -14,11 +12,13 @@ export class IframeMessagingProvider implements MessagingProvider {
   private id: string
   private services: Map<string, any>
 
-  private constructor(id: string, otherWindow: Window, targetOrigin = '*') {
+  private constructor(id: string, otherWindow: Window, targetOrigin: string) {
     this.id = id
     this.otherWindow = otherWindow
     this.targetOrigin = targetOrigin
     this.services = new Map()
+
+    console.log('new IframeMessagingProvider', { id, targetOrigin })
   }
 
   public stopService(name: string) {
@@ -39,21 +39,7 @@ export class IframeMessagingProvider implements MessagingProvider {
     console.log('Disconnected to ', this.id) // TODO: нужен ид
   }
 
-  static create(
-    type: IframeMessagingType,
-    id = ''
-  ): Promise<IframeMessagingProvider> | void {
-    switch (type) {
-      case 'parent':
-        return this.createParent(id)
-      case 'child':
-        return this.createChild()
-      default:
-        throw new Error('bla bla')
-    }
-  }
-
-  private static createChild(): Promise<IframeMessagingProvider> {
+  static createChild(): Promise<IframeMessagingProvider> {
     const getParentId = () => {
       const { frameElement } = window
       if (frameElement) return frameElement.id
@@ -69,7 +55,7 @@ export class IframeMessagingProvider implements MessagingProvider {
     }
 
     const id = getParentId()
-    console.log('createChild ', id)
+    console.log('createChild', { id })
 
     return new Promise((resolve, _) => {
       const waitInitMessage = (event: MessageEvent) => {
@@ -92,7 +78,10 @@ export class IframeMessagingProvider implements MessagingProvider {
     })
   }
 
-  private static createParent(id: string): Promise<IframeMessagingProvider> {
+  static createParent(
+    id: string,
+    targetOrigin = '*'
+  ): Promise<IframeMessagingProvider> {
     const iframe: HTMLIFrameElement = document.getElementById(
       id
     ) as HTMLIFrameElement
@@ -100,13 +89,14 @@ export class IframeMessagingProvider implements MessagingProvider {
       throw new Error(`Can't find iframe ${id}`)
     }
 
-    console.log('createParent', id)
+    console.log('createParent', { id, targetOrigin })
 
     const initMessage = (
       childWindow: Window
     ): Promise<IframeMessagingProvider> => {
       return new Promise((resolve, _) => {
-        const sendInitMessage = () => childWindow.postMessage(id + '_init', '*')
+        const sendInitMessage = () =>
+          childWindow.postMessage(id + '_init', targetOrigin)
         const timer = setInterval(sendInitMessage, INIT_MESSAGE_DURATION)
 
         const waitCompliteMessage = (event: MessageEvent) => {
