@@ -1,6 +1,6 @@
 {
   "name": "@daocasino/platform-messaging",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "This library allows you to wrap your classes and use them over iframe",
   "license": "MIT",
   "author": "Gar|k <garik.djan@gmail.com>",
@@ -15,12 +15,12 @@
   "homepage": "https://github.com/DaoCasino/platform-messaging/#readme",
   "scripts": {
     "prepare": "yarn build",
-    "prebuild": "rm -rf lib && rm -rf lib.browser",
+    "prebuild": "rimraf -rf lib && rimraf -rf lib.browser",
     "build": "tsc && tsc -p tsconfig.browser.json",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "test": "mocha -r ts-node/register src/tests/*.*.ts",
-    "prebuild:example": "rm -rf example/dist",
-    "build:example":"rollup -c",
+    "prebuild:example": "rimraf -rf example/dist",
+    "build:example": "rollup -c",
     "prestart:example": "yarn build:example",
     "start:example": "serve example"
   },
@@ -42,7 +42,8 @@
     "rollup-plugin-typescript2": "^0.25.3",
     "serve": "^11.3.0",
     "ts-node": "^8.2.0",
-    "typescript": "^3.5.1"
+    "typescript": "^3.5.1",
+    "rimraf": "^3.0.2"
   },
   "files": [
     "lib",

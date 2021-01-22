@@ -6,7 +6,11 @@
   </head>
   <body>
     <p>Open console</p>
-    <iframe id="child-iframe" src="/child?iframe=child-iframe"></iframe>
+    <iframe id="child-iframe"></iframe>
     <script src="/dist/service.js"></script>
+    <script>
+      const frame = document.getElementById('child-iframe')
+      frame.src = '/child?iframe=child-iframe&' + Date.now()
+    </script>
   </body>
 </html>

@@ -63,14 +63,15 @@ export class IframeMessagingProvider implements MessagingProvider {
 
         if (event.data == id + '_init') {
           window.removeEventListener('message', waitInitMessage)
-          ;(event.source as Window).postMessage(id + '_complete', event.origin)
-          resolve(
-            new IframeMessagingProvider(
-              id,
-              event.source as Window,
-              event.origin
-            )
-          )
+
+          let source = event.source as Window
+
+          if (source.parent === source.top) {
+            source = source.top
+          }
+
+          source.postMessage(id + '_complete', event.origin)
+          resolve(new IframeMessagingProvider(id, source, event.origin))
         }
       }
 
